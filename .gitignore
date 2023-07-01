@@ -1,0 +1,4 @@
+### venv ###
+# Virtualenv
+.venv
+volumes/

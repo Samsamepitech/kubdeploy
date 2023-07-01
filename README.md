@@ -1,34 +1,68 @@
-# CI-CD-app-deployment-with-AWS
-Group project with continuous integration and deployment on AWS for a web shopping service
+# Exemple d'application web crud avec python flask
 
-# Group #
-* Hayet Yefsah ->
-[hayetyefsah](https://github.com/hayetyefsah)
-* Arnaud Dejeammes ->
-[Arnaud-Dejeammes](https://github.com/Arnaud-Dejeammes)
-* Charles Ramade ->
-[Smogg22](https://github.com/Smogg22)
+# Détails de l'application
+Cette application Flask permet de gérer des flux RSS. Elle utilise une base de données SQLite pour stocker les informations des flux, et permet d'ajouter, de modifier et de supprimer des flux. Les articles associés à chaque flux sont récupérés grâce à la bibliothèque feedparser.
 
-# Description #
 
-From a git repository of an app divided in micro-services:
-https://gitlab.com/ma.it.consulting/projet-fil-rouge-neosoft.git
+## Utilisation et documentation
 
-We created one AWS CodeCommit (github repository) each in order to create pipeline for continuous integration and development.
-As soon as we commit and push modifications to one of our micro-services,a new image is automatically generated thanks to a buildspec.yaml file.
+L'application contient les routes suivantes :
 
-Then we deployed an infrastructure thanks to AWS CloudFormation. In this infra, there are:
-- 1 Virtual Private Cloud
-- 2 Public Subnets
-- 2 Security Group
-- 1 Internet Gateway
-- 1 VPC Gateway Attachment
-- 1 Route Table
-- 1 Route
-- 2 Subnet Route Table Associations
-- 1 Role for AWS EKS service
-- 1 Role for AWS EKS nodes
-- 1 EKS (Kubernetes) cluster
-- 1 EKS nodegroup, in which we defined a resource template and auto-scaling policy
+- `/` : page d'accueil qui affiche tous les flux RSS enregistrés
+- `/show/<int:id>` : affiche un flux RSS spécifique ainsi que les articles associés
+- `/new` : permet d'ajouter un nouveau flux RSS
+- `/edit/<int:id>` : permet de modifier un flux RSS existant
+- `/delete/<int:id>` : permet de supprimer un flux RSS existant
+- `/upload` : permet d'importer des flux RSS à partir d'un fichier JSON
 
-Finally, we managed micro-services deployment in nodes thanks to manifest files in yaml format. These manifests also define ports our micro-services use to communicate between them and outside the cluster.
+L'application utilise également la bibliothèque Flask-Swagger-UI pour afficher la documentation de l'API. La documentation est disponible à l'adresse `/docs`.
+
+## Exemples d'utilisation
+
+```python
+# Ajout d'un nouveau flux RSS
+@app.route('/new', methods=['POST'])
+def add_feed():
+    name = request.form['name']
+    url = request.form['url']
+    image = request.form['image']
+    feed = RssFeed(name=name, url=url, image=image)
+    db.session.add(feed)
+    db.session.commit()
+    flash('Feed added successfully!', 'success')
+    return redirect(url_for('home'))
+
+# Modification d'un flux RSS
+@app.route('/edit/<int:id>', methods=['POST'])
+def edit(id):
+    feed = RssFeed.query.get(id)
+    name = request.form['name']
+    url = request.form['url']
+    image = request.form['image']
+    feed.name = name
+    feed.url = url
+    feed.image = image
+    db.session.commit()
+    flash('Feed updated successfully!', 'success')    
+    return redirect(url_for('home'))
+
+# Suppression d'un flux RSS
+@app.route('/delete/<int:id>')
+def delete(id):
+    feed = RssFeed.query.get(id)
+    db.session.delete(feed)
+    db.session.commit()
+    flash('Feed deleted successfully!', 'success')
+    return redirect(url_for('home'))
+```
+
+## Installation
+
+Pour installer et exécuter l'application :*
+1. Installer Python sur votre environnement de travail
+2. Installer les dépendances en exécutant la commande `pip install -r requirements.txt`
+3. Exécuter l'application avec la commande `flask --app main run`
+4. Rendez-vous sur à l'adresse locale 127.0.0.1:5000
+
+## Auteurs
+poei Dev칠ops
