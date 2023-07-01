@@ -54,9 +54,9 @@ jobs:
       with:
         registry: europe-west1-docker.pkg.dev
         project_id: taibi-samira
-        image_name: reg-flask/adservice
+        image_name: reg-flask/currency
         image_tag: ${{github.sha}}
-        dockerfile: ./ARCH-adservice/Dockerfile
+        dockerfile: ./ARCH-currency-service/Dockerfile
         context: .
 
    
