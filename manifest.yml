@@ -1,0 +1,39 @@
+#app_flask deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app_flask
+  name: app_flask
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app_flask
+  template:
+    metadata:
+      labels:
+        app: app_flask
+    spec:
+      containers:
+        - image: europe-west1-docker.pkg.dev/taibi-samira/reg-flask/app_flask:$GITHUB_SHA
+          name: app_flask
+          ports:
+            - containerPort: 5011
+              name: app_flask
+---
+#app_flask service
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: app_flask
+  name: app_flask
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "app_flask"
+    port: 5011
+    targetPort: 5011
+  selector:
+    app: app_flask
