@@ -16,7 +16,7 @@ spec:
         app: app-flask
     spec:
       containers:
-        - image: europe-west1-docker.pkg.dev/taibi-samira/reg-flask/app_flask:3133b2a0f2787ebf0506dafbe118596bbcdce369
+        - image: europe-west1-docker.pkg.dev/taibi-samira/reg-flask/app_flask:2b461fd75d7c7c7d3a37a30feae7721eac641a72
           name: app-flask
           ports:
             - containerPort: 5011
