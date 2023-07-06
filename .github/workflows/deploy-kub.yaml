@@ -58,11 +58,11 @@ jobs:
         location: europe-west1
   #       # credentials: {{ secrets.GKE_SA_KEY }}
 
-    # Setup gcloud CLI
-    # - uses: google-github-actions/setup-gcloud@v0
-    #   with:
-    #     service_account_key: {{ secrets.GKE_SA_KEY }}
-    #     project_id: {{ secrets.GKE_PROJECT }}
+      #Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: ${{ secrets.GKE_PROJECT }}
 
     - name: push to gcr
       uses: RafikFarhad/push-to-gcr-github-action@v5-beta
