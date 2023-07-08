@@ -48,9 +48,8 @@ jobs:
 
       - name: 'Storing SA Key to json file'
         id: sa-config
-        run: |
-          echo ${{ secrets.GKE_SA_KEY }} > credentials.json
-        
+        run: echo ${{ secrets.GKE_SA_KEY }} > credentials.json
+
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
