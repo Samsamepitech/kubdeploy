@@ -46,7 +46,7 @@ jobs:
       - name: Terraform Init
         run: terraform init
         env:
-          GOOGLE_CREDENTIALS: ${{secrets.GKE_SA_KEY}}
+          GOOGLE_CREDENTIALS:
 
     # Generates an execution plan for Terraform
     # - name: Terraform Plan

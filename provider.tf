@@ -11,10 +11,10 @@ provider "google" {
   region  = "europe-west1"
   zone    = "europe-west1-b"
 }
-terraform {
-  backend "gcs" {
-    bucket      = "samsambucket"
-    prefix      = "terraform"
-    credentials =  "taibi-samira-b2411ac21c59.json"
-  }
-}
+# terraform {
+#   backend "gcs" {
+#     bucket      = "samsambucket"
+#     prefix      = "terraform"
+#     credentials =  "taibi-samira-b2411ac21c59.json"
+#   }
+# }
