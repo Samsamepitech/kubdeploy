@@ -1,53 +1,64 @@
-name: Build and Deploy terraform to GKE
-
+# this workflow job is used to automate provision of servers and resources
+# for Google Cloud Project with terraform
+# author: Yann Mulonda
+name: 'Terraform'
 on:
   push:
     branches:
-      - main
-
+    - main
+  pull_request:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 jobs:
-  setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
-    runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: 'Google auth'
-      id: 'auth'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        create_credentials_file: 'true'
-        workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
-        service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
-
   terraform:
-    name: 'Terraform'
+    name: 'Provision GCP'
     runs-on: ubuntu-latest
-    environment: production
-
+    #environment: production
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
-            #Inform a working directory if .tf files are not in root folder
-        working-directory: ../terraform
-
+# On push to terraform branch, build or change infrastructure according to Terraform configuration files
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
+      - name: 'Google auth'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+            create_credentials_file: 'true'
+            workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+            service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+    # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v2
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      #with:
+      #  cli_config_credentials_token: {{ secrets.TF_API_TOKEN }}
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: terraform init
-
-
-      # Generates an execution plan for Terraform
-      - name: Terraform Plan
-        run: terraform plan -input=false
-
-
-      - name: Terraform Apply
-
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
-
+        working-directory: ./terraform
+    # # Checks that all Terraform configuration files adhere to a canonical format
+    # - name: Terraform Format
+    #   run: terraform fmt -check
+    # Generates an execution plan for Terraform
+    # - name: Terraform Plan
+    #   run: terraform plan
+    # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud".
+    # See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    #   - name: Terraform Apply
+    #   # If any commit message in your push or the HEAD commit of your PR
+    #   # contains the strings <construire> -- then terraform Apply step will run
+    #     if: "contains(github.event.commits[0].message, '[construire]')"
+    #   # terraform plan
+    #     run: |
+    #      terraform apply -auto-approve
+    #   - name: Terraform Destroy
+    #   # If any commit message in your push or the HEAD commit of your PR
+    #   # contains the strings [detruire] -- then terraform Destry step will run
+    #     if: "contains(github.event.commits[0].message, '[detruire]')"
+    #   # terraform plan -destroy
+    #     run: |
+    #      terraform apply -destroy -auto-approve
