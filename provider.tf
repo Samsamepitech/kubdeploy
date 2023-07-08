@@ -15,6 +15,6 @@ terraform {
   backend "gcs" {
     bucket      = "samsambucket"
     prefix      = "terraform"
-    credentials = "taibi-samira-3f2a23e32f1f.json"
+    credentials = "taibi-samira-b2411ac21c59.json"
   }
 }
