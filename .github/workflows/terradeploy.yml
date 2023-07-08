@@ -11,8 +11,12 @@ on:
   workflow_dispatch:
 jobs:
   terraform:
-    name: 'Provision GCP'
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_bucket_name: 'samsambucket'
+      TF_VAR_project_id: 'taibi-samira' # your project id
+      TF_VAR_region: 'europe-west1'
+      TF_VAR_zone: 'europe-west1-b'
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -25,6 +29,9 @@ jobs:
     # On push to terraform branch, build or change infrastructure according to Terraform configuration files
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: 'Google auth'
         id: 'auth'
         uses: 'google-github-actions/auth@v1'
@@ -33,38 +40,20 @@ jobs:
             workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
             service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
-      - name: Checkout
-        uses: actions/checkout@v3
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       #with:
       #  cli_config_credentials_token: {{ secrets.TF_API_TOKEN }}
-      - name: Gcloud login
-        run: gcloud auth application-default login --quiet
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+
+
       - name: Terraform Init
-        run: terraform init
-        env:
-          GOOGLE_CREDENTIALS:
+        id: tf_init
+        run: terraform init -backend-config="bucket=samsambucket"
 
-    # Generates an execution plan for Terraform
-      - name: Terraform Plan
-        run: terraform plan
-    # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud".
-    # See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+
       - name: Terraform Apply
-    #   # If any commit message in your push or the HEAD commit of your PR
-    #   # contains the strings <construire> -- then terraform Apply step will run
-    #
-    #   # terraform plan
-        run: |
-          terraform apply -auto-approve
-    #   - name: Terraform Destroy
-    #   # If any commit message in your push or the HEAD commit of your PR
-    #   # contains the strings [detruire] -- then terraform Destry step will run
+        id: tf_apply
+        run: terraform apply --auto-approve
 
-    #   # terraform plan -destroy
-    #     run: |
-    #      terraform apply -destroy -auto-approve
