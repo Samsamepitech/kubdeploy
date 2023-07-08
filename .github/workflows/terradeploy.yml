@@ -19,12 +19,12 @@ jobs:
 
     #environment: production
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-# On push to terraform branch, build or change infrastructure according to Terraform configuration files
+    defaults:
+      run:
+        shell: bash
+    # On push to terraform branch, build or change infrastructure according to Terraform configuration files
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: 'Google auth'
         id: 'auth'
         uses: 'google-github-actions/auth@v1'
@@ -32,6 +32,9 @@ jobs:
             create_credentials_file: 'true'
             workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
             service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+
+      - name: Checkout
+        uses: actions/checkout@v3
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
