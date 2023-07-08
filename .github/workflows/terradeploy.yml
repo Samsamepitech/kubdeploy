@@ -52,8 +52,11 @@ jobs:
         id: tf_init
         run: terraform init -backend-config="bucket=samsambucket"
 
+      - name: Terraform Plan
+        id: terraform_plan
+        run: terraform plan
 
       - name: Terraform Apply
         id: tf_apply
-        run: terraform apply --auto-approve
+        run: terraform apply 
 
